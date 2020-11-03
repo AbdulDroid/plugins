@@ -6,6 +6,7 @@ package io.flutter.plugins.googlemaps;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
+import android.app.Activity;
 import android.content.Context;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
@@ -529,6 +530,19 @@ final class GoogleMapController
       return;
     }
     mapView.onResume();
+  }
+
+  @Override
+  public void onActivityResumed(Activity activity) {
+    if (disposed || activity.hashCode() != registrarActivityHashCode) {
+      return;
+    }
+    mapView.onResume();
+    // Workaround for https://github.com/flutter/flutter/issues/40284
+    // This apparently forces a re-render of the map.
+    if (googleMap != null) {
+      googleMap.setMapType(googleMap.getMapType());
+    }
   }
 
   @Override
